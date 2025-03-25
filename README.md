@@ -1,4 +1,4 @@
-# samr-enum Tool
+# samr-enum
 
 `samr-enum.py` is a Python script that leverages the Microsoft SAMR protocol to enumerate domain users, groups, computers, password policies, and other account-related information from a target system. It supports both **NTLM** (default) and **Kerberos** authentication and can optionally export results in multiple formats (TXT, CSV, JSON).
 
@@ -10,12 +10,12 @@ The tool was initially developed as part of a Master’s thesis in cybersecurity
 - Display detailed debug output for SAMR calls.
 - Securely prompt for a password if none is provided.
 - Export enumeration results in multiple formats (TXT, CSV, JSON).
-- Supports **NTLM** (default) and **Kerberos** authentication.
+- Supports NTLM (default) and Kerberos authentication.
 - Cross-forest enumeration.
 
 ### Requirements
 
-- **Python**: 3
+- **Python**: 3.x
 - **Dependencies**:
   - `Impacket` 0.12 (MIT License)  
     *Note: Some antivirus solutions (e.g., Microsoft Defender, CrowdStrike) may flag Impacket components.*
@@ -30,13 +30,10 @@ These packages provide the necessary C headers and libraries for compiling parts
 
 1. **Clone the Repository (Full Project)**
 
-This repository contains multiple resources—such as traffic captures and output from different enumeration programs—because it’s part of a larger research project. If you need **all** those resources, clone the entire project:
-
    ```bash
    git clone https://github.com/studylab1/samr-enum.git
-   cd SAMR-Enum-Lab
+   cd samr-enum
    ```
-However, if you only want to test the samr-enum.py tool without downloading the other resources, it’s often easier to download just that single [file](https://github.com/studylab1/SAMR-Enum-Lab/raw/refs/heads/main/samr-enum.py) directly from the GitHub web interface.
 
 2. **Install Dependencies**
 ```bash
