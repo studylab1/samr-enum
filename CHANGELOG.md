@@ -1,0 +1,22 @@
+# Changelog
+
+This file documents all notable changes made to the SAMR enumeration tool samr-enum.py.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](https://semver.org/).
+
+## [1.0.1] - 2025-03-12
+### Changed
+- Included version number.
+- Changed Impacket reference.
+- Adjusted the code for 'import' requirements according to PEP 8.
+
+### Fixed
+- Fixed issue with missing Domain SID in `enumerate=users`, `enumerate=display-info`, and `enumerate=summary` enumerations.
+
+## [1.0.0] - 2025-03-08
+### Added
+- Initial release of the SAMR Enumeration Tool.
+- Domain enumeration capabilities including users, computers, local groups, and domain groups.
+- Support for both NTLM (default) and Kerberos authentication.
+- Options to export results in TXT, CSV, and JSON formats.
+- Debug logging with detailed SAMR operation numbers.
