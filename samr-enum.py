@@ -17,7 +17,7 @@ Features:
   - Supports NTLM (default) and Kerberos authentication.
 """
 
-__version__ = "1.0.1"
+__version__ = "1.2.0"
 
 # Global help text constant
 HELP_TEXT = r"""
@@ -35,11 +35,12 @@ Required OPTIONS:
 Optional OPTIONS:
   domain            Domain of the user for authentication (required if using Kerberos).
   auth              Authentication protocol. Acceptable values: 'ntlm' (default) or 'kerberos'.
-  debug             Display debug details of the SAMR calls. Acceptable values: 'true' or 'false' (default: 'false').
+  debug             Display debug details of the SAMR calls.
   export            Export the data. Acceptable values: 'txt' (default), 'csv', or 'json'.
     format          Acceptable values are 'txt', 'csv' or 'json', with the default being 'txt'.
-  opnums            Set to 'true' to display SAMR OpNums in output (default: 'false').
+  opnums            Display SAMR OpNums in output.
   help              Print help page.
+  acl               Query and display the Access Control List (ACL) for the target object (only for 'enumerate=account-details' supported)
 
 ENUMERATION PARAMETERS:
   The following parameters control what to enumerate. Provide one of these (omitting the "enumerate=" prefix)
@@ -90,12 +91,12 @@ ENUMERATION PARAMETERS:
 
 Usage Examples:
   python samr-enum.py target=192.168.1.1 username=micky password=mouse123 enumerate=users
-  python samr-enum.py target=192.168.1.1 username=micky password=  enumerate=computers debug=true
+  python samr-enum.py target=192.168.1.1 username=micky password=  enumerate=computers debug
   python samr-enum.py target=dc1.domain-a.local username=micky password=mouse123 enumerate=local-groups export=export.csv format=csv
-  python samr-enum.py target=dc1.domain-a.local username=micky password=mouse123 enumerate=domain-groups opnums=true
+  python samr-enum.py target=dc1.domain-a.local username=micky password=mouse123 enumerate=domain-groups opnums
   python samr-enum.py target=dc1.domain-a.local username=micky password=mouse123 enumerate=user-memberships-localgroups user=Administrator
   python samr-enum.py target=dc1.domain-a.local username=micky password=mouse123 enumerate=user-memberships-domaingroups user=Administrator
-  python samr-enum.py target=dc1.domain-a.local username=micky password=mouse123 enumerate=account-details user=Administrator
+  python samr-enum.py target=dc1.domain-a.local username=micky password=mouse123 enumerate=account-details user=Administrator acl
   python samr-enum.py target=dc1.domain-a.local username=micky password=mouse123 enumerate=local-group-details group="Administrators"
   python samr-enum.py target=dc1.domain-a.local username=micky password=mouse123 enumerate=domain-group-details group="Domain Admins"
   python samr-enum.py target=dc1.domain-a.local username=micky password=mouse123 enumerate=display-info type=users
@@ -109,34 +110,34 @@ For help, run:
     samr-enum.py help
 
 Column Abbreviations for "display-info type=users" output:
-  - RID:          Relative Identifier.
-  - Last Logon:   Date of last logon (YYYY.MM.DD).
-  - PwdSet:       Date when the password was set (YYYY.MM.DD).
-  - PwdNE:        "Password Never Expires" flag (Yes/No).
-  - PwdExp:       "Password Expired" flag (Yes/No).
-  - ForceChg:     Date when a password force-change is scheduled (YYYY.MM.DD).
-  - AccDis:       "Account Disabled" flag (Yes/No).
-  - PreAuth:      "Pre-Authentication required" flag (Yes/No).
-  - Delg:         "Delegation required" flag (Yes/No).
-  - BadCnt:       Count of bad password attempts.
-  - Username:     The user's login name.
-  - Full Name:    The user's full display name.
+  RID:          Relative Identifier.
+  Last Logon:   Date of last logon (YYYY.MM.DD).
+  PwdSet:       Date when the password was set (YYYY.MM.DD).
+  PwdNE:        "Password Never Expires" flag (Yes/No).
+  PwdExp:       "Password Expired" flag (Yes/No).
+  ForceChg:     Date when a password force-change is scheduled (YYYY.MM.DD).
+  AccDis:       "Account Disabled" flag (Yes/No).
+  PreAuth:      "Pre-Authentication required" flag (Yes/No).
+  Delg:         "Delegation required" flag (Yes/No).
+  BadCnt:       Count of bad password attempts.
+  Username:     The user's login name.
+  Full Name:    The user's full display name.
 
 Column Abbreviations for "display-info type=computers" output:
-  - RID:          Relative Identifier.
-  - Name:         Computer name (the network name of the machine, shown without its trailing ‘$’ sign).
-  - Logons:       Count of successful logons.
-  - LastLogon:    Date of last logon (YYYY.MM.DD).
-  - PwdLastSet:   Date when the computer’s password was last set (YYYY.MM.DD).
-  - BadPwdCnt:    Count of bad password attempts.
-  - PID:          Primary Group ID associated with the computer account.
-  - Type:         Trust relationship type (indicates whether the computer is registered as a workstation or server).
-  - Enabled:      “Yes” if the account is active; “No” if disabled.
-  - PwdNReq:      “Password Not Required” flag (Yes/No).
-  - PwdNExp:      “Password Never Expires” flag (Yes/No).
-  - Deleg:        Delegation status flag (Yes/No).
-  - AcctStatus:   Account status/type (e.g. “Enabled” or “Disabled”).
-  - Description:  Description field containing additional information or notes.
+  RID:          Relative Identifier.
+  Name:         Computer name (the network name of the machine, shown without its trailing "$" sign).
+  Logons:       Count of successful logons.
+  LastLogon:    Date of last logon (YYYY.MM.DD).
+  PwdLastSet:   Date when the computers password was last set (YYYY.MM.DD).
+  BadPwdCnt:    Count of bad password attempts.
+  PID:          Primary Group ID associated with the computer account.
+  Type:         Trust relationship type (indicates whether the computer is registered as a workstation or server).
+  Enabled:      "Yes" if the account is active; "No" if disabled.
+  PwdNReq:      "Password Not Required" flag (Yes/No).
+  PwdNExp:      "Password Never Expires" flag (Yes/No).
+  Deleg:        Delegation status flag (Yes/No).
+  AcctStatus:   Account status/type (e.g. "Enabled" or "Disabled").
+  Description:  Description field containing additional information or notes.
 
 Summary Output Fields (when using enumerate=summary):
   Domain SID:                The security identifier (SID) of the domain.
@@ -163,6 +164,39 @@ A list of flags representing password policy requirements (when using enumerate=
   StoreClr:                  Store passwords using reversible (cleartext) encryption.
   RefuseChg:                 Refuse password changes under specific conditions.
 
+Column Abbreviations for Security Descriptor Controls:
+  OWND  SE_OWNER_DEFAULTED          Owner field was defaulted rather than explicitly set.
+  GRPD  SE_GROUP_DEFAULTED          Group field was defaulted rather than explicitly set.
+  DPRS  SE_DACL_PRESENT             A discretionary ACL (DACL) is present.
+  DACD  SE_DACL_DEFAULTED           The DACL was defaulted rather than explicitly specified.
+  SPRS  SE_SACL_PRESENT             A system ACL (SACL) is present.
+  SACD  SE_SACL_DEFAULTED           The SACL was defaulted rather than explicitly specified.
+  DAIR  SE_DACL_AUTO_INHERIT_REQ    DACL auto-inheritance is requested.
+  SAIR  SE_SACL_AUTO_INHERIT_REQ    SACL auto-inheritance is requested.
+  DAIN  SE_DACL_AUTO_INHERITED      DACL was auto-inherited from the parent object.
+  SAIN  SE_SACL_AUTO_INHERITED      SACL was auto-inherited from the parent object.
+  DPRT  SE_DACL_PROTECTED           The DACL is protected from inheritance.
+  SPRT  SE_SACL_PROTECTED           The SACL is protected from inheritance.
+  RMCV  SE_RM_CONTROL_VALID         Resource Manager control is valid.
+  SELF  SE_SELF_RELATIVE            The security descriptor is in self-relative format (offset-based).
+
+Column Abbreviations for Access Mask Permissions:
+    USR_READ_GEN    User: Read General Information.
+    USR_READ_PREF   User: Read Preferences.
+    USR_READ_LOGON  User: Read Logon Information.
+    USR_CHG_PW      User: Change Password.
+    USR_FORCE_PW    User: Force Password Change.
+    USR_LIST_GRPS   User: List Group Memberships.
+    USR_READ_ACC    User: Read Account Information.
+    USR_WR_ACC      User: Write Account Information.
+    USR_CREATE      User: Create Account.
+    USR_DELETE      User: Delete Account.
+    USR_AUTO_LOCK   User: Auto-Lock (e.g., automatic locking of an account).
+    GEN_READ        Generic: Read permission.
+    GEN_WRITE       Generic: Write permission.
+    GEN_EXEC        Generic: Execute permission.
+    GEN_ALL         Generic: All permissions.
+
 Additional Notes:
   - This tool requires the Impacket libraries.
   - Ensure you have the appropriate privileges to perform enumeration tasks.
@@ -174,6 +208,8 @@ import time
 import getpass
 from datetime import datetime
 from impacket.dcerpc.v5 import transport, samr
+from impacket.dcerpc.v5.dtypes import SECURITY_DESCRIPTOR
+from impacket.structure import Structure
 import csv, json, csv
 
 # SID_NAME_USE local definitions
@@ -183,13 +219,30 @@ SID_NAME_DOMAIN = 3
 SID_NAME_ALIAS = 4
 SID_NAME_WKN_GRP = 5
 
-###########################################################
+# Security Descriptor Control 16-bits Flags
+CONTROL_FLAGS = {
+    0x0001: "SE_OWNER_DEFAULTED",
+    0x0002: "SE_GROUP_DEFAULTED",
+    0x0004: "SE_DACL_PRESENT",
+    0x0008: "SE_DACL_DEFAULTED",
+    0x0010: "SE_SACL_PRESENT",
+    0x0020: "SE_SACL_DEFAULTED",
+    0x0100: "SE_DACL_AUTO_INHERIT_REQ",
+    0x0200: "SE_SACL_AUTO_INHERIT_REQ",
+    0x0400: "SE_DACL_AUTO_INHERITED",
+    0x0800: "SE_SACL_AUTO_INHERITED",
+    0x1000: "SE_DACL_PROTECTED",
+    0x2000: "SE_SACL_PROTECTED",
+    0x4000: "SE_RM_CONTROL_VALID",
+    0x8000: "SE_SELF_RELATIVE",
+}
+
 # SAMR FUNCTION -> OPNUM MAPPING
 # Official reference from MS-SAMR specification (decimal).
-###########################################################
 SAMR_FUNCTION_OPNUMS = {
     'SamrConnect': 0,
     'SamrCloseHandle': 1,
+    'SamrQuerySecurityObject': 3,
     'SamrLookupDomainInSamServer': 5,
     'SamrEnumerateDomainsInSamServer': 6,
     'SamrOpenDomain': 7,
@@ -211,11 +264,9 @@ SAMR_FUNCTION_OPNUMS = {
     'SamrQueryInformationUser2': 47,
 }
 
-###########################################################
 # SAMR FUNCTION -> ACCESS MASK
 # Only track calls that actually specify a desiredAccess.
 # Others show no Access Mask.
-###########################################################
 SAMR_FUNCTION_ACCESS = {
     'SamrOpenUser': 0x0002011b,  # USER_LIST_GROUPS
     'SamrConnect': 0x00000031,  # desiredAccess=0x31
@@ -223,6 +274,32 @@ SAMR_FUNCTION_ACCESS = {
     'SamrOpenGroup': 0x00000010,  # GROUP_LIST_MEMBERS
     'SamrOpenAlias': 0x0000000C,  # ALIAS_LIST_MEMBERS
 }
+
+ACCESS_MASK_MAPPING = {
+    0x00000001: "USR_READ_GEN",  # User: Read General Information
+    0x00000002: "USR_READ_PREF",  # User: Read Preferences
+    0x00000004: "USR_READ_LOGON",  # User: Read Logon Info
+    0x00000008: "USR_CHG_PW",  # User: Change Password
+    0x00000010: "USR_FORCE_PW",  # User: Force Password Change
+    0x00000020: "USR_LIST_GRPS",  # User: List Groups
+    0x00000040: "USR_READ_ACC",  # User: Read Account Info
+    0x00000080: "USR_WR_ACC",  # User: Write Account Info
+    0x00000100: "USR_CREATE",  # User: Create Account (example)
+    0x00000200: "USR_DELETE",  # User: Delete Account (example)
+    0x00000400: "USR_AUTO_LOCK",  # User: Auto-Lock (example)
+    # Generic rights (if applicable – these are common generic rights bits):
+    0x00020000: "GEN_READ",
+    0x00040000: "GEN_WRITE",
+    0x00080000: "GEN_EXEC",
+    0x00100000: "GEN_ALL",
+}
+
+
+def yes_no_sid(flag):
+    """
+    Convert a boolean flag to "Yes" if True, or "No" if False.
+    """
+    return "Yes" if flag else "No"
 
 
 def add_opnum_call(opnums_list, func_name, actual_access=None):
@@ -235,20 +312,18 @@ def add_opnum_call(opnums_list, func_name, actual_access=None):
     :param actual_access: (Optional) The actual Access Mask value (int) used, if available.
     :return: None
     """
-    opnum = SAMR_FUNCTION_OPNUMS.get(func_name)
+    pure_func_name = func_name.split(" (")[0]
+    opnum = SAMR_FUNCTION_OPNUMS.get(pure_func_name)
     if opnum is not None:
         if actual_access is not None:
-            # Show the *actual* Access Mask if provided
             opnums_list.append(f"{func_name} (OpNum {opnum}, Access Mask: 0x{actual_access:08X})")
         else:
-            # Fall back to the old dictionary-based Access Mask
-            access_val = SAMR_FUNCTION_ACCESS.get(func_name)
+            access_val = SAMR_FUNCTION_ACCESS.get(pure_func_name)
             if access_val is not None:
                 opnums_list.append(f"{func_name} (OpNum {opnum}, Access Mask: 0x{access_val:08X})")
             else:
                 opnums_list.append(f"{func_name} (OpNum {opnum})")
     else:
-        # Neither OpNum nor Access is known
         opnums_list.append(func_name)
 
 
@@ -324,7 +399,7 @@ def decode_filetime(value):
     low_part_ndr = value.fields['LowPart']
 
     high_part_int = extract_ndr_value(high_part_ndr)  # becomes plain int
-    low_part_int = extract_ndr_value(low_part_ndr)    # becomes plain int
+    low_part_int = extract_ndr_value(low_part_ndr)  # becomes plain int
 
     # Combine them into a 64-bit integer
     return (high_part_int << 32) | (low_part_int & 0xFFFFFFFF)
@@ -333,16 +408,20 @@ def decode_filetime(value):
 def parse_named_args(argv):
     """
     Parse named arguments of the form key=value from the command line.
+    For arguments passed without an '=', store the key with the value True.
 
-    :param argv: sys.argv or similar list of command-line tokens
-    :return: dict mapping lowercase key -> string value
-    Example: python samr-enum.py target=server1 user=admin password=pass123
+    :param argv: sys.argv or a similar list of command-line tokens.
+    :return: dict mapping lowercase keys to their corresponding string values or True if flag.
+    Example: python samr-enum.py target=server1 user=admin password=pass123 debug
     """
     args = {}
     for item in argv[1:]:
         if '=' in item:
             key, val = item.split('=', 1)
             args[key.strip().lower()] = val.strip()
+        else:
+            # For flag parameters that do not include an '=', store them as True
+            args[item.strip().lower()] = True
     return args
 
 
@@ -403,15 +482,14 @@ def extract_ndr_value(ndr_object):
 def safe_str(value):
     """
     Convert a value to a Unicode string safely.
+    If the value is already an int, return its string representation.
     If the value is an RPC_UNICODE_STRING, extract and decode its Buffer.
-
-    :param value: The value to convert.
-    :return: A safe string representation.
+    Otherwise, try to return str(value) or repr(value).
     """
-    # If already a Python string, return it directly.
     if isinstance(value, str):
         return value
-    # If the object has a getData() method, use it.
+    if isinstance(value, int):
+        return str(value)
     if hasattr(value, 'getData') and callable(value.getData):
         try:
             data = value.getData()
@@ -420,13 +498,11 @@ def safe_str(value):
             return str(data)
         except Exception:
             pass
-    # If the class name indicates an RPC_UNICODE_STRING, decode the Buffer.
     if hasattr(value, '__class__') and value.__class__.__name__ == 'RPC_UNICODE_STRING':
         try:
             return value.fields['Buffer'].decode('utf-16-le', errors='replace').rstrip('\x00')
         except Exception:
             return repr(value)
-    # Fallback conversion.
     try:
         return str(value)
     except Exception:
@@ -827,7 +903,6 @@ def export_data(filename, fmt, data):
 
             # Branch for summary export
             elif isinstance(data[0], dict) and 'domain_info' in data[0]:
-                # In summary, the exported data is a single dictionary.
                 summary = data[0]
                 domain_info = summary.get('domain_info', {})
                 password_policy = summary.get('password_policy', {})
@@ -1010,6 +1085,511 @@ def export_data(filename, fmt, data):
         print(f"Data exported to {filename} ({fmt.upper()})")
     except Exception as e:
         print(f"Export failed: {str(e)}")
+
+
+def safe_int(x, default=0):
+    """
+    Safely convert an NDR value to an integer.
+
+    This function converts the input value to a string and then attempts to
+    convert that string to an integer. If the conversion fails, it returns
+    the specified default value.
+
+    :param x: The NDR value to be converted.
+    :param default: The default integer to return if conversion fails (default 0).
+    :return: The integer representation of x, or default if conversion fails.
+    """
+
+    try:
+        return int(str(x))
+    except Exception:
+        return default
+
+
+def get_user_security_descriptor(dce, domainHandle, user_rid, debug, opnums_called):
+    """
+    Retrieve the raw security descriptor for a given user account.
+    This function opens the user account using the provided user RID and domain handle,
+    queries the security object (SAMR OpNum 3) for that user, and extracts the raw security
+    descriptor bytes from the returned structure. It prints debug information if enabled and
+    tracks the SAMR operations performed via the opnums_called list.
+
+    :param dce: The DCE/RPC connection object.
+    :param domainHandle: The handle to the domain where the user resides.
+    :param user_rid: The relative identifier (RID) of the user.
+    :param debug: Boolean flag to enable debug output.
+    :param opnums_called: List that tracks SAMR operations performed.
+    :return: The raw security descriptor data as a bytes object.
+    :raises Exception: If any part of the security descriptor cannot be extracted.
+    """
+
+    userHandleResp = samr.hSamrOpenUser(dce, domainHandle, 0x0002011b, user_rid)
+    add_opnum_call(opnums_called, "SamrOpenUser")
+    userHandle = userHandleResp['UserHandle']
+
+    security_info = 0x00000001 | 0x00000002 | 0x00000004
+    security_resp = samr.hSamrQuerySecurityObject(dce, userHandle, security_info)
+    add_opnum_call(opnums_called, "SamrQuerySecurityObject")
+
+    try:
+        sec_desc_obj = security_resp['SecurityDescriptor']
+        if isinstance(sec_desc_obj, list):
+            sec_desc_obj = sec_desc_obj[0]
+        # Try retrieving the inner security descriptor.
+        if "SecurityDescriptor" in sec_desc_obj.fields:
+            inner_sd = sec_desc_obj.fields["SecurityDescriptor"]
+        elif 0 in sec_desc_obj.fields:
+            inner_sd = sec_desc_obj.fields[0]
+        else:
+            raise Exception("Could not find inner security descriptor in SAMPR_SR_SECURITY_DESCRIPTOR fields.")
+
+        raw_bytes = None
+        fields = inner_sd.fields
+        if "Data" in fields:
+            raw_bytes = fields["Data"]
+        else:
+            for key, value in fields.items():
+                if isinstance(key, int) and key == 0:
+                    raw_bytes = value
+                    break
+
+        if raw_bytes is None:
+            raise Exception("Could not find 'Data' field in inner SecurityDescriptor structure.")
+
+        try:
+            raw_data = bytes(raw_bytes)
+        except Exception as conv_err:
+            if hasattr(raw_bytes, "getData") and callable(raw_bytes.getData):
+                raw_data = raw_bytes.getData()
+            else:
+                raise conv_err
+    except Exception as e:
+        raise
+
+    samr.hSamrCloseHandle(dce, userHandle)
+    add_opnum_call(opnums_called, "SamrCloseHandle")
+    return raw_data
+
+
+def get_field_value(field, default=0):
+    """
+    Convert an NDR field to an integer.
+
+    This function attempts to convert the given NDR field into an integer. It first
+    checks whether the field has a callable getData() method and uses its return value.
+    If that fails, it then checks for a 'fields' attribute containing a 'Data' key and uses
+    that. If neither is available, it falls back to converting the field’s string representation.
+    If any conversion fails, the provided default value is returned.
+
+    :param field: The NDR field to convert.
+    :param default: The default integer value to return if conversion fails (default is 0).
+    :return: The integer value of the field, or the default value if conversion is unsuccessful.
+    """
+    try:
+        if hasattr(field, 'getData') and callable(field.getData):
+            return int(field.getData())
+        elif hasattr(field, 'fields') and 'Data' in field.fields:
+            return int(field.fields['Data'])
+        else:
+            return int(str(field).strip())
+    except Exception:
+        return default
+
+
+def parse_sd_control_flags(sd_bytes):
+    """
+    Parse the 16-bit Control field of a self-relative security descriptor.
+
+    This function reads bytes 2-3 of the provided security descriptor bytes,
+    converts them into an integer, and then evaluates each control flag against
+    a predefined mapping (CONTROL_FLAGS). It returns a dictionary where each key
+    is a control flag name and the value is either "Yes" or "No".
+
+    :param sd_bytes: The raw bytes of a self-relative security descriptor.
+    :return: A dictionary mapping control flag names to "Yes"/"No" values.
+    """
+    if len(sd_bytes) < 4:
+        return {}
+    control_value = int.from_bytes(sd_bytes[2:4], byteorder='little')
+    results = {}
+    for bitmask, flag_name in CONTROL_FLAGS.items():
+        results[flag_name] = "Yes" if (control_value & bitmask) == bitmask else "No"
+    return results
+
+
+def parse_sid_from_offset(sd_bytes, offset):
+    """
+    Parse a SID from a self-relative security descriptor starting at a given offset.
+
+    The SID is expected to be structured as:
+      - 1 byte Revision,
+      - 1 byte SubAuthorityCount,
+      - 6 bytes IdentifierAuthority (big-endian),
+      - Followed by SubAuthorityCount groups of 4 bytes each (little-endian).
+    The function returns the canonical SID string (e.g., "S-1-5-32-544").
+
+    :param sd_bytes: The raw self-relative security descriptor bytes.
+    :param offset: The offset within sd_bytes where the SID begins.
+    :return: A canonical SID string, or "N/A" if the offset is invalid.
+    """
+    if offset == 0 or offset >= len(sd_bytes):
+        return "N/A"
+    try:
+        revision = sd_bytes[offset]
+        sub_auth_count = sd_bytes[offset + 1]
+        id_auth_bytes = sd_bytes[offset + 2: offset + 8]
+        id_auth = int.from_bytes(id_auth_bytes, byteorder='big')
+        sid_str = f"S-{revision}-{id_auth}"
+        pos = offset + 8
+        for _ in range(sub_auth_count):
+            if pos + 4 <= len(sd_bytes):
+                sub = int.from_bytes(sd_bytes[pos:pos + 4], byteorder='little')
+                sid_str += f"-{sub}"
+                pos += 4
+            else:
+                break
+        return sid_str
+    except Exception as e:
+        return f"Error parsing SID: {e}"
+
+
+def parse_self_relative_sd(sd_bytes):
+    """
+    Parse a self-relative security descriptor from raw bytes.
+
+    This function interprets the structure of a self-relative security descriptor:
+      BYTE Revision;
+      BYTE Sbz1;
+      WORD Control;
+      DWORD Owner (offset);
+      DWORD Group (offset);
+      DWORD Sacl (offset);    <-- Not used in this context
+      DWORD Dacl (offset);
+    It then retrieves the owner SID, group SID, control flags (as a dictionary),
+    and the DACL offset from the raw bytes.
+
+    :param sd_bytes: The raw bytes representing a self-relative security descriptor.
+    :return: A tuple (owner_sid, group_sid, control_flags, dacl_offset).
+    """
+    if len(sd_bytes) < 20:
+        return ("N/A", "N/A", {}, 0)
+    try:
+        control_flags = parse_sd_control_flags(sd_bytes)
+        owner_offset = int.from_bytes(sd_bytes[4:8], byteorder='little')
+        group_offset = int.from_bytes(sd_bytes[8:12], byteorder='little')
+        # Sacl offset is at bytes 12-16; we skip its value.
+        dacl_offset = int.from_bytes(sd_bytes[16:20], byteorder='little')
+        owner_sid = parse_sid_from_offset(sd_bytes, owner_offset) if owner_offset != 0 else "N/A"
+        group_sid = parse_sid_from_offset(sd_bytes, group_offset) if group_offset != 0 else "N/A"
+        return (owner_sid, group_sid, control_flags, dacl_offset)
+    except Exception as e:
+        return (f"Error parsing SD: {e}", f"Error parsing SD: {e}", {}, 0)
+
+
+def parse_acl(sd_bytes, dacl_offset):
+    """
+    Parse the Discretionary ACL (DACL) from a self-relative security descriptor.
+
+    This function uses the provided DACL offset into the security descriptor bytes
+    to read the ACL header (revision, size, ACE count) and then iterates through the
+    ACEs. For each ACE, it extracts the ACE type, flags, size, access mask, and SID,
+    and returns a list of dictionaries representing each ACE.
+
+    :param sd_bytes: The raw self-relative security descriptor bytes.
+    :param dacl_offset: The offset where the DACL begins in sd_bytes.
+    :return: A list of dictionaries, each containing details of an ACE.
+    """
+    aces = []
+    if dacl_offset == 0 or dacl_offset + 8 > len(sd_bytes):
+        return aces
+
+    # Read the ACL header
+    acl_revision = sd_bytes[dacl_offset]
+    acl_size = int.from_bytes(sd_bytes[dacl_offset + 2:dacl_offset + 4], byteorder='little')
+    ace_count = int.from_bytes(sd_bytes[dacl_offset + 4:dacl_offset + 6], byteorder='little')
+
+    # The end of the ACL is at offset (dacl_offset + acl_size)
+    end_of_acl = dacl_offset + acl_size
+    pos = dacl_offset + 8  # ACEs start right after the 8-byte ACL header
+
+    for i in range(ace_count):
+        # If we cannot even read the next ACE header, stop
+        if pos + 4 > end_of_acl:
+            break
+
+        ace_type = sd_bytes[pos]
+        ace_flags = sd_bytes[pos + 1]
+        ace_size = int.from_bytes(sd_bytes[pos + 2:pos + 4], byteorder='little')
+
+        # If the ACE extends beyond the end of the ACL, stop
+        if pos + ace_size > end_of_acl:
+            break
+
+        access_mask = int.from_bytes(sd_bytes[pos + 4:pos + 8], byteorder='little')
+
+        # The SID starts at offset (pos + 8)
+        sid_str = parse_sid_from_offset(sd_bytes, pos + 8)
+        aces.append({
+            'ace_type': ace_type,
+            'ace_flags': ace_flags,
+            'ace_size': ace_size,
+            'access_mask': access_mask,
+            'sid': sid_str
+        })
+        pos += ace_size
+
+    return aces
+
+
+def format_control_flags_output(control_flags):
+    """
+    Format the security descriptor control flags into a tabulated string.
+
+    This function takes a dictionary of control flags (mapping flag names to "Yes"/"No")
+    and formats them into two lines: one with abbreviated flag names and one with their
+    corresponding values. The output is a neatly spaced string suitable for display.
+
+    :param control_flags: Dictionary of security descriptor control flags.
+    :return: A formatted string showing control flag abbreviations and their values.
+    """
+    flag_order = [
+        "SE_OWNER_DEFAULTED",
+        "SE_GROUP_DEFAULTED",
+        "SE_DACL_PRESENT",
+        "SE_DACL_DEFAULTED",
+        "SE_SACL_PRESENT",
+        "SE_SACL_DEFAULTED",
+        "SE_DACL_AUTO_INHERIT_REQ",
+        "SE_SACL_AUTO_INHERIT_REQ",
+        "SE_DACL_AUTO_INHERITED",
+        "SE_SACL_AUTO_INHERITED",
+        "SE_DACL_PROTECTED",
+        "SE_SACL_PROTECTED",
+        "SE_RM_CONTROL_VALID",
+        "SE_SELF_RELATIVE"
+    ]
+    abbrev = {
+        "SE_OWNER_DEFAULTED": "OWND",
+        "SE_GROUP_DEFAULTED": "GRPD",
+        "SE_DACL_PRESENT": "DPRS",
+        "SE_DACL_DEFAULTED": "DACD",
+        "SE_SACL_PRESENT": "SPRS",
+        "SE_SACL_DEFAULTED": "SACD",
+        "SE_DACL_AUTO_INHERIT_REQ": "DAIR",
+        "SE_SACL_AUTO_INHERIT_REQ": "SAIR",
+        "SE_DACL_AUTO_INHERITED": "DAIN",
+        "SE_SACL_AUTO_INHERITED": "SAIN",
+        "SE_DACL_PROTECTED": "DPRT",
+        "SE_SACL_PROTECTED": "SPRT",
+        "SE_RM_CONTROL_VALID": "RMCV",
+        "SE_SELF_RELATIVE": "SELF"
+    }
+    col_width = 4
+    spacing = 2
+
+    abbr_line_parts = []
+    val_line_parts = []
+    for flag in flag_order:
+        abbr_line_parts.append(f"{abbrev.get(flag, '???'):<{col_width}}")
+        val_line_parts.append(f"{control_flags.get(flag, 'N/A'):<{col_width}}")
+    abbr_line = (" " * spacing).join(abbr_line_parts)
+    val_line = (" " * spacing).join(val_line_parts)
+    dash_line = "-" * len(abbr_line)
+    return f"\t\t{abbr_line}\n\t\t{dash_line}\n\t\t{val_line}"
+
+
+def resolve_sid_name(sid_str):
+    """
+    Provide a fallback mapping for well-known SIDs to friendly names.
+
+    This function checks the provided SID string against a hardcoded mapping
+    of well-known SIDs (e.g., "S-1-1-0", "S-1-5-32-544") and returns the corresponding
+    friendly name. If the SID is not found in the mapping, "Unknown" is returned.
+
+    :param sid_str: The SID string to resolve.
+    :return: A friendly name corresponding to the SID, or "Unknown" if not found.
+    """
+    sid_str = sid_str.strip().upper()
+    mapping = {
+        "S-1-1-0": "Everyone",
+        "S-1-5-32-544": "Administrators",
+        "S-1-5-32-545": "Users",
+        "S-1-5-32-546": "Guests",
+        "S-1-5-32-547": "Power Users",
+    }
+    return mapping.get(sid_str, "Unknown")
+
+
+def resolve_sid_name_by_samr(sid_str, dce, domainHandle, serverHandle, debug, opnums_called):
+    """
+    Resolve a friendly name for a SID using a SAMR lookup.
+
+    For well-known SIDs (e.g., those starting with "S-1-5-32" or "S-1-1-0"), this function
+    bypasses the SAMR lookup and returns a fallback mapping. For other SIDs, it attempts a
+    SAMR lookup via hSamrLookupIdsInDomain. If the lookup fails or the expected fields are missing,
+    the fallback mapping is used.
+
+    :param sid_str: The SID string to resolve.
+    :param dce: The DCE/RPC connection object.
+    :param domainHandle: The handle to the domain.
+    :param serverHandle: The SAMR server handle.
+    :param debug: Boolean flag to enable debug output.
+    :param opnums_called: List to record SAMR operations performed.
+    :return: The friendly name corresponding to the SID, or "Unknown" if not resolvable.
+    """
+    sid_str = sid_str.strip().upper()
+    # Immediately handle Everyone and Builtin SIDs.
+    if sid_str == "S-1-1-0" or sid_str.startswith("S-1-5-32"):
+        return resolve_sid_name(sid_str)
+
+    try:
+        parts = sid_str.split('-')
+        rid = int(parts[-1])
+    except Exception as e:
+        return resolve_sid_name(sid_str)
+
+    try:
+        response = samr.hSamrLookupIdsInDomain(dce, domainHandle, [rid])
+        if isinstance(response, int):
+            raise Exception(f"Lookup response is an integer: {response}")
+        # If the response does not appear to be a structured object, fail fast.
+        if not hasattr(response, "dump"):
+            raise Exception("Response does not have expected attributes")
+        if hasattr(response, 'Names'):
+            names_list = response.Names
+        elif isinstance(response, dict) and 'Names' in response:
+            names_list = response['Names']
+        else:
+            raise Exception("No 'Names' field found in response")
+
+        # Normalize the names list.
+        if isinstance(names_list, dict) and 'Element' in names_list:
+            names_array = names_list['Element']
+        elif isinstance(names_list, list):
+            names_array = names_list
+        else:
+            names_array = names_list
+
+        if names_array and len(names_array) > 0:
+            if isinstance(names_array[0], dict):
+                return safe_str(names_array[0].get('Data', "Unknown"))
+            elif hasattr(names_array[0], 'Data'):
+                return safe_str(names_array[0].Data)
+        return "Unknown"
+    except Exception as e:
+        return resolve_sid_name(sid_str)
+
+
+def get_int_from_field(field, default=0):
+    """
+    Convert an NDR field to an integer.
+
+    If the field has a 'fields' dictionary containing a 'Data' key, its value is used;
+    otherwise, the function attempts to convert the field's string representation to an integer.
+    If conversion fails, the default value is returned.
+
+    :param field: The NDR field to convert.
+    :param default: The default integer value to return if conversion fails.
+    :return: The integer value of the field or the default value.
+    """
+    try:
+        if hasattr(field, 'fields') and 'Data' in field.fields:
+            data = field.fields['Data']
+            if isinstance(data, bytes):
+                # For IdentifierAuthority, assume big-endian; for subauthorities, they are little-endian.
+                return int.from_bytes(data, 'big')
+            return int(data)
+        return int(str(field).strip())
+    except Exception:
+        return default
+
+
+def parse_sid_obj(sid_obj):
+    """
+    Parse an Impacket SID object into a canonical SID string.
+
+    This function reads the SID object's internal 'fields' (Revision, IdentifierAuthority,
+    and SubAuthority) and constructs the canonical SID string (e.g., "S-1-5-32-544").
+    If the IdentifierAuthority is missing or zero, it defaults to 5.
+
+    :param sid_obj: An Impacket SID object with a 'fields' attribute.
+    :return: The canonical SID string, or an error string if parsing fails.
+    """
+    try:
+        fields = sid_obj.fields
+        if not fields:
+            return "N/A"
+        # Get Revision (default to 1)
+        revision = get_field_value(fields.get('Revision', 1), 1)
+
+        # Get IdentifierAuthority; if missing or 0, default to 5.
+        id_auth = fields.get('IdentifierAuthority', None)
+        if id_auth is None:
+            id_auth_int = 5
+        else:
+            id_auth_int = get_field_value(id_auth, 0)
+            if id_auth_int == 0:
+                id_auth_int = 5
+
+        # Process SubAuthority values.
+        sub_auths = fields.get('SubAuthority', [])
+        sub_ints = [get_field_value(sub, 0) for sub in sub_auths]
+
+        # Build the SID string.
+        sid_str = f"S-{revision}-{id_auth_int}"
+        for s in sub_ints:
+            sid_str += f"-{s}"
+        return sid_str
+    except Exception as e:
+        return f"Error parsing SID: {e}"
+
+
+def get_sid(sid_obj):
+    """
+    Return a canonical SID string from an Impacket SID object.
+
+    This function wraps the parse_sid_obj() function to bypass any failing built-in
+    conversion methods and ensures a canonical SID string is returned.
+
+    :param sid_obj: The Impacket SID object.
+    :return: The canonical SID string.
+    """
+    return parse_sid_obj(sid_obj)
+
+
+def parse_access_mask(mask):
+    """
+    Parse an access mask integer into a list of permission names.
+
+    Given an access mask (as an integer), this function iterates through a predefined
+    mapping (ACCESS_MASK_MAPPING) and returns a list of permission names for each bit
+    that is set in the mask.
+
+    :param mask: The access mask as an integer.
+    :return: A list of permission names corresponding to the bits set in the mask.
+    """
+    permissions = []
+    for bit in sorted(ACCESS_MASK_MAPPING.keys()):
+        if mask & bit:
+            permissions.append(ACCESS_MASK_MAPPING[bit])
+    return permissions
+
+
+def format_access_mask(mask):
+    """
+    Format an access mask into a human-readable, comma-separated string of permission names.
+
+    This function calls parse_access_mask() to retrieve the list of permission names
+    corresponding to the provided mask and then joins them into a single string.
+
+    :param mask: The access mask as an integer.
+    :return: A string listing the permission names, or "No Permissions" if none are set.
+    """
+    perms = parse_access_mask(mask)
+    if perms:
+        return ", ".join(perms)
+    else:
+        return "No Permissions"
 
 
 def enumerate_local_groups_plain(dce, serverHandle, debug, opnums_called):
@@ -1698,7 +2278,8 @@ def get_user_details(dce, domainHandle, user_input, debug, opnums_called):
     }
 
 
-def get_local_group_details(dce, builtinHandle, alias_name, debug, opnums_called, primaryDomainHandle, primaryDomainSid):
+def get_local_group_details(dce, builtinHandle, alias_name, debug, opnums_called, primaryDomainHandle,
+                            primaryDomainSid):
     """
     Retrieve detailed information about a local alias (group) from the Builtin domain.
     This function looks up the alias by its name using the Builtin domain handle,
@@ -2077,7 +2658,6 @@ def display_info(dce, serverHandle, info_type, debug, opnums_called):
         for comp in basic_computers:
             rid = comp.get('rid')
             try:
-                # This helper should mimic get_user_details but for computer objects
                 details = get_computer_details(dce, domainHandle, rid, debug, opnums_called)
                 detailed_computers.append(details)
             except Exception as e:
@@ -2092,7 +2672,8 @@ def display_info(dce, serverHandle, info_type, debug, opnums_called):
 
     elif info_type == 'local-groups':
         # Use the Builtin domain to enumerate local groups (aliases)
-        builtinHandle, builtinDomainName, domainSidString = get_builtin_domain_handle(dce, serverHandle, debug, opnums_called)
+        builtinHandle, builtinDomainName, domainSidString = get_builtin_domain_handle(dce, serverHandle, debug,
+                                                                                      opnums_called)
         try:
             aliasResp = samr.hSamrEnumerateAliasesInDomain(dce, builtinHandle)
             add_opnum_call(opnums_called, "SamrEnumerateAliasesInDomain")
@@ -2103,7 +2684,8 @@ def display_info(dce, serverHandle, info_type, debug, opnums_called):
         group_tuples = [(safe_str(alias['Name']), alias['RelativeId']) for alias in aliases]
         for group_name, group_rid in group_tuples:
             try:
-                details = enumerate_display_info_local_groups(dce, builtinHandle, group_name, group_rid, debug, opnums_called)
+                details = enumerate_display_info_local_groups(dce, builtinHandle, group_name, group_rid, debug,
+                                                              opnums_called)
                 results.append(details)
             except Exception as e:
                 results.append({'group_name': group_name, 'rid': group_rid, 'error': str(e)})
@@ -2241,19 +2823,19 @@ def get_password_policy(dce, domainHandle, debug, opnums_called):
         props = password_info['PasswordProperties']
         # (Assuming these constants exist in samr; if not, define them as needed.)
         pwd_complex = bool(props & samr.DOMAIN_PASSWORD_COMPLEX)
-        no_anon     = bool(props & samr.DOMAIN_PASSWORD_NO_ANON_CHANGE)
-        no_clrchg   = bool(props & samr.DOMAIN_PASSWORD_NO_CLEAR_CHANGE)
+        no_anon = bool(props & samr.DOMAIN_PASSWORD_NO_ANON_CHANGE)
+        no_clrchg = bool(props & samr.DOMAIN_PASSWORD_NO_CLEAR_CHANGE)
         lock_admins = bool(props & samr.DOMAIN_LOCKOUT_ADMINS)
-        store_clr   = bool(props & samr.DOMAIN_PASSWORD_STORE_CLEARTEXT)
-        refuse_chg  = bool(props & samr.DOMAIN_REFUSE_PASSWORD_CHANGE)
+        store_clr = bool(props & samr.DOMAIN_PASSWORD_STORE_CLEARTEXT)
+        refuse_chg = bool(props & samr.DOMAIN_REFUSE_PASSWORD_CHANGE)
 
         pwd_props_flags = {
             'PwdComplex': yes_no(pwd_complex),
-            'NoAnon':     yes_no(no_anon),
-            'NoClrChg':   yes_no(no_clrchg),
+            'NoAnon': yes_no(no_anon),
+            'NoClrChg': yes_no(no_clrchg),
             'LockAdmins': yes_no(lock_admins),
-            'StoreClr':   yes_no(store_clr),
-            'RefuseChg':  yes_no(refuse_chg),
+            'StoreClr': yes_no(store_clr),
+            'RefuseChg': yes_no(refuse_chg),
         }
 
         return {
@@ -2282,6 +2864,7 @@ def get_domain_info(dce, serverHandle, debug, opnums_called):
     :param opnums_called: List tracking SAMR operations performed.
     :return: Dictionary with domain details (domain SID, domain name, etc.).
     """
+
     def ticks_to_days(ticks_obj):
         if not isinstance(ticks_obj, samr.OLD_LARGE_INTEGER):
             return 0
@@ -2452,12 +3035,12 @@ def main():
     target = args.get('target', '')
     username = args.get('username', '')
     password = args.get('password', '')  # might be empty -> prompt
-    debug = args.get('debug', 'false').lower() == 'true'
+    debug = args.get('debug', False)
     export_file = args.get('export', '')
     export_format = args.get('format', 'txt').lower()
     auth_mode = args.get('auth', 'ntlm').lower()  # "kerberos" or "ntlm" default
     domain = args.get('domain', '')  # mandatory for Kerberos authentication
-    opnums_param = args.get('opnums', 'false').lower() == 'true'
+    opnums_param = any(arg.lower() == "opnums" for arg in sys.argv)
 
     # If password is empty, prompt user. getpass hides the input on CLI
     if password == '':
@@ -2522,8 +3105,8 @@ def main():
                                                                           serverHandle,
                                                                           debug, opnums_called)
             groups_result, did_aliases = enumerate_domain_groups(dce,
-                                                                    domainHandle,
-                                                                    debug)
+                                                                 domainHandle,
+                                                                 debug)
             add_opnum_call(opnums_called, "SamrEnumerateGroupsInDomain")
             if did_aliases:
                 add_opnum_call(opnums_called, "SamrEnumerateAliasesInDomain")
@@ -2550,8 +3133,29 @@ def main():
             user = args.get('user', '')
             if not user:
                 raise Exception("Missing 'user=' argument")
-            domainHandle, _, domainSidString = get_domain_handle(dce, serverHandle, debug, opnums_called)
+            domainHandle, domainName, domainSidString = get_domain_handle(dce, serverHandle, debug, opnums_called)
             user_details = get_user_details(dce, domainHandle, user, debug, opnums_called)
+            # If the 'acl' flag is provided, query and include the user's ACL.
+            if 'acl' in args or any(arg.lower() == 'acl' for arg in sys.argv):
+                sd_raw = get_user_security_descriptor(dce, domainHandle, user_details['rid'], debug, opnums_called)
+                sd_bytes = bytes(sd_raw)
+                # Parse the security descriptor including the DACL offset.
+                owner_sid, group_sid, control_flags, dacl_offset = parse_self_relative_sd(sd_bytes)
+
+                # Resolve friendly names for owner and group.
+                owner_name = resolve_sid_name_by_samr(owner_sid, dce, domainHandle, serverHandle, debug, opnums_called)
+                group_name = resolve_sid_name_by_samr(group_sid, dce, domainHandle, serverHandle, debug, opnums_called)
+                user_details['acl_owner_sid'] = f"{owner_sid} ({owner_name})"
+                user_details['acl_group_sid'] = f"{group_sid} ({group_name})"
+                user_details['acl_control_flags'] = format_control_flags_output(control_flags)
+
+                # If a DACL is present (per control flags) and dacl_offset is nonzero, parse the ACEs.
+                if control_flags.get("SE_DACL_PRESENT", "No") == "Yes" and dacl_offset != 0:
+                    aces = parse_acl(sd_bytes, dacl_offset)
+                else:
+                    aces = []
+                user_details['acl_dacl'] = aces
+
             enumerated_objects = [user_details]
 
         elif enumeration == 'local-group-details':
@@ -2685,24 +3289,53 @@ def main():
             print(f"  Script Path:          {details.get('script_path', 'N/A')}")
             print(f"  Workstations:         {details.get('workstations', 'N/A')}")
 
+            if 'acl' in args or any(arg.lower() == 'acl' for arg in sys.argv):
+                print("  ACL:")
+                print(f"    Owner SID:\t{user_details.get('acl_owner_sid', 'N/A')}")
+                print(f"    Group SID:\t{user_details.get('acl_group_sid', 'N/A')}")
+                print("\n    Control Flags:")
+                print(user_details.get('acl_control_flags', 'N/A'))
+                dacl_aces = user_details.get('acl_dacl', [])
+
+                print("\n    DACL ACEs:")
+                if dacl_aces:
+                    for i, ace in enumerate(dacl_aces, start=1):
+                        print(f"\t  ACE {i}:")
+                        # Determine ACE type string based on ace_type numeric value:
+                        ace_type = ace.get('ace_type')
+                        if ace_type == 0:
+                            ace_type_str = "Access Allowed"
+                        elif ace_type == 1:
+                            ace_type_str = "Access Denied"
+                        else:
+                            ace_type_str = f"Unknown ({ace_type})" if ace_type is not None else "N/A"
+                        print(f"\t\tType:\t\t{ace_type_str}")
+                        print(f"\t\tNT ACE Flags:\t0x{ace.get('ace_flags', 0):02X}")
+                        print(
+                            f"\t\tAccess Mask:\t0x{ace.get('access_mask', 0):08X} ({format_access_mask(ace.get('access_mask', 0))})")
+                        sid = ace.get('sid', "N/A")
+                        print(f"\t\tSID:\t\t{sid}")
+                else:
+                    print("\tNone")
+
         elif enumeration == 'local-group-details':
             details = enumerated_objects[0]
-            print(f"\n{'-'*65}")
+            print(f"\n{'-' * 65}")
             print(f"{'Local Group Name:':<20}\t{details.get('alias_name', 'N/A')}")
             print(f"{'RID:':<20}\t{details.get('rid', 'N/A')}")
             print(f"{'Member Count:':<20}\t{details.get('member_count', 'N/A')}")
             print(f"{'Domain SID:':<20}\t{details.get('primary_domain_sid', 'N/A')}")
             members = details.get('members')
             if members:
-                print(f"{'-'*65}")
+                print(f"{'-' * 65}")
                 print(f"{'RID':<20}\t{'Username':<20}")
-                print(f"{'-'*32}")
+                print(f"{'-' * 32}")
                 for rid, username in members:
                     print(f"{rid:<20}\t{username:<20}")
             print()
 
         elif enumeration == 'domain-group-details':
-            print(f"\n{'-'*65}")
+            print(f"\n{'-' * 65}")
             details = enumerated_objects[0]
             print(f"{'Domain Group Name:':<20}\t{details.get('group_name', 'N/A')}")
             print(f"{'RID:':<20}\t{details.get('rid', 'N/A')}")
@@ -2935,7 +3568,7 @@ def main():
                 enumerated_objects = display_info(dce, serverHandle, info_type, debug, opnums_called)
 
         elif enumeration == 'summary':
-            # We assume enumerated_objects[0] is the summary dictionary
+            # Assume enumerated_objects[0] is the summary dictionary
             summary = enumerated_objects[0]
             domain_info = summary.get('domain_info', {})
             print("\nDomain Information:")
