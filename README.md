@@ -63,10 +63,11 @@ python samr-enum.py help
 
 - **domain:** The domain of the user for authentication (required if using Kerberos).
 - **auth:**  The authentication protocol. Can be ntlm (default) or kerberos.
-- **debug:**  Displays debug details of the SAMR calls. Acceptable values: true or false (default: false).
+- **debug:**  Display debug details of the SAMR calls.
 - **export and format:**  Export the data in txt, csv, or json format. Default is txt.
-- **opnums:**  Set to true to display SAMR OpNums in the output. Default is false.
+- **opnums:**  Display SAMR OpNums in the output.
 - **help:**  Print the help page and exit.
+- **acl**  Query and display the Access Control List (ACL) for the target object (only for `enumerate=account-details` supported)
 
 #### Enumeration Parameters (use with enumerate=)
 
@@ -85,12 +86,12 @@ python samr-enum.py help
 ###  Parameters Example
 ```
   python samr-enum.py target=192.168.1.1 username=micky password=mouse123 enumerate=users
-  python samr-enum.py target=192.168.1.1 username=micky password=  enumerate=computers debug=true
+  python samr-enum.py target=192.168.1.1 username=micky password=  enumerate=computers debug
   python samr-enum.py target=dc1.domain-a.local username=micky password=mouse123 enumerate=local-groups export=export.csv format=csv
-  python samr-enum.py target=dc1.domain-a.local username=micky password=mouse123 enumerate=domain-groups opnums=true
+  python samr-enum.py target=dc1.domain-a.local username=micky password=mouse123 enumerate=domain-groups opnums
   python samr-enum.py target=dc1.domain-a.local username=micky password=mouse123 enumerate=user-memberships-localgroups user=Administrator
   python samr-enum.py target=dc1.domain-a.local username=micky password=mouse123 enumerate=user-memberships-domaingroups user=Administrator
-  python samr-enum.py target=dc1.domain-a.local username=micky password=mouse123 enumerate=account-details user=Administrator
+  python samr-enum.py target=dc1.domain-a.local username=micky password=mouse123 enumerate=account-details user=Administrator acl
   python samr-enum.py target=dc1.domain-a.local username=micky password=mouse123 enumerate=local-group-details group="Administrators"
   python samr-enum.py target=dc1.domain-a.local username=micky password=mouse123 enumerate=domain-group-details group="Domain Admins"
   python samr-enum.py target=dc1.domain-a.local username=micky password=mouse123 enumerate=display-info type=users
@@ -236,6 +237,77 @@ Number of objects:  	1
 ================================================================
 ```
 
+```
+$ python samr-enum.py target=ydc1.domain-y.local username=Administrator password=LabAdm1! enumerate=account-details user=Administrator acl
+Execution started at: 2025-04-08 01:02:12.128610
+
+Account Details for Administrator:
+  RID:                  500
+  Username:             Administrator
+  Full Name:            Display name
+  Description:          Built-in account for administering the computer/domain
+  Last Logon:           2025-04-06 10:56:41
+  Logon Count:          72
+  Password Last Set:    2025-02-02 15:42:23
+  Password Can Chg:     2025-02-03 15:42:23
+  Password Force Chg:   Never
+  Password Expired:     No
+  Password Never Exp-s: No
+  Password Bad Count:   0
+  Account Expires:      Never
+  Account Disabled:     No
+  Pre-Auth. Required:   Yes
+  Delegation Allowed:   Yes
+  Smartcard Required:   No
+
+  Primary Group ID:     513
+  Home Directory:       C:\temp
+  Home Drive:           
+  Profile Path:         profile path
+  Script Path:          logon script
+  Workstations:         
+  ACL:
+    Owner SID:	S-1-5-32-544 (Administrators)
+    Group SID:	S-1-5-32-544 (Administrators)
+
+    Control Flags:
+		OWND  GRPD  DPRS  DACD  SPRS  SACD  DAIR  SAIR  DAIN  SAIN  DPRT  SPRT  RMCV  SELF
+		----------------------------------------------------------------------------------
+		No    No    Yes   No    No    No    No    No    No    No    No    No    No    Yes 
+
+    DACL ACEs:
+	  ACE 1:
+		Type:		Access Allowed
+		NT ACE Flags:	0x00
+		Access Mask:	0x0002035B (USR_READ_GEN, USR_READ_PREF, USR_CHG_PW, USR_FORCE_PW, USR_READ_ACC, USR_CREATE, USR_DELETE, GEN_READ)
+		SID:		S-1-1-0
+	  ACE 2:
+		Type:		Access Allowed
+		NT ACE Flags:	0x00
+		Access Mask:	0x000F07FF (USR_READ_GEN, USR_READ_PREF, USR_READ_LOGON, USR_CHG_PW, USR_FORCE_PW, USR_LIST_GRPS, USR_READ_ACC, USR_WR_ACC, USR_CREATE, USR_DELETE, USR_AUTO_LOCK, GEN_READ, GEN_WRITE, GEN_EXEC)
+		SID:		S-1-5-32-544
+	  ACE 3:
+		Type:		Access Allowed
+		NT ACE Flags:	0x00
+		Access Mask:	0x0002031B (USR_READ_GEN, USR_READ_PREF, USR_CHG_PW, USR_FORCE_PW, USR_CREATE, USR_DELETE, GEN_READ)
+		SID:		S-1-15-3-1024-1730716382-2949791265-2036182297-688374192-553408039-4133924312-4201181712-267922143
+	  ACE 4:
+		Type:		Access Allowed
+		NT ACE Flags:	0x00
+		Access Mask:	0x00020044 (USR_READ_LOGON, USR_READ_ACC, GEN_READ)
+		SID:		S-1-5-21-3461051276-3658573231-1749369878-500
+================================================================
+Execution time:     	0.05 seconds
+Destination target: 	ydc1.domain-y.local
+Domain SID:         	S-1-5-21-3461051276-3658573231-1749369878
+Account:            	Administrator
+Enumerate:          	account-details
+Authentication:     	NTLM
+Execution status:   	success
+Number of objects:  	1
+================================================================
+```
+
 ### Configuration & Troubleshooting
 - Ensure your Python environment meets the specified version and dependency requirements.
 - If you experience issues with antivirus software (e.g., Microsoft Defender, CrowdStrike, or other AV solutions), consider adjusting your AV settings, as Impacket components may be flagged.
@@ -257,7 +329,7 @@ This tool is provided for legitimate security testing, research, or educational 
 This project uses [Semantic Versioning](https://semver.org/) (SemVer) to track releases. The current version is defined in the `samr-enum.py` file as follows:
 
 ```python
-__version__ = "1.0.1"
+__version__ = "1.2.0"
 ```
 
 ## Acknowledgements
